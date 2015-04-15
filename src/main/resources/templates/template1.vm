@@ -19,15 +19,27 @@
 				line-height: 1.5em;
 				font-family: verdana,sans-serif;
 			}
+			
+			.hidden{
+				font-size:1px;
+				color: #ffffff;
+			}
 		
 		</style>
 
 	</head>
 
 	<body>
-	
+		<p class="hidden">document_split_parts[$splitIdentifiers.get($math.random(0,3))]</p>
 		#foreach($para in $paragraphs)
-			<p>$para</p>
+			#if($foreach.count > 0 && $foreach.count % 5 == 0)
+				<p class="hidden" style="page-break-before:always;">
+					document_split_parts[$splitIdentifiers.get($math.random(0,10))]<br/>
+				</p>
+				<p>$para</p>
+			#else
+				<p>$para</p>	
+			#end
 		#end
 		
 	</body>
