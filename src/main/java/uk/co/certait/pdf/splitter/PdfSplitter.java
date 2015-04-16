@@ -27,16 +27,20 @@ public class PdfSplitter {
 
     public Map<String, PDDocument> splitPdf(String path) throws IOException, COSVisitorException {
 
-        long start = System.currentTimeMillis();
-
         PDDocument document = PDDocument.load(path);
-        Map<String, List<Integer>> metaData = extractSplitMetaData(document);
-        Map<String, PDDocument> splitDocuments = new HashMap<>();
-        PDFMergerUtility merger = new PDFMergerUtility();
+        Map<String, List<Integer>> metaData = extractDocumentSplitMetaData(document);
+        Map<String, PDDocument> documents = splitDocument(document, new Splitter(), new PDFMergerUtility(), metaData);
+        document.close();
 
+        return documents;
+    }
+
+    protected Map<String, PDDocument> splitDocument(PDDocument document, Splitter splitter, PDFMergerUtility merger, Map<String, List<Integer>> metaData) throws IOException {
+
+        Map<String, PDDocument> splitDocuments = new HashMap<>();
         int pageIndex = 1;
 
-        for(PDDocument page : new Splitter().split(document)) {
+        for(PDDocument page : splitter.split(document)) {
             for(String key : metaData.keySet()) {
                 if(metaData.get(key).contains(pageIndex)) {
                     if(!splitDocuments.containsKey(key)) {
@@ -45,35 +49,25 @@ public class PdfSplitter {
 
                     merger.appendDocument(splitDocuments.get(key), page);
                 }
-
             }
 
             ++pageIndex;
-            
             page.close();
         }
-        
-        document.close();
-        
-        System.out.println("Processing Time document (" + (pageIndex - 1) + " pages): " + (System.currentTimeMillis() - start));
 
         return splitDocuments;
     }
 
-    protected Map<String, List<Integer>> extractSplitMetaData(PDDocument document) throws IOException {
+    protected Map<String, List<Integer>> extractDocumentSplitMetaData(PDDocument document) throws IOException {
 
         Map<String, List<Integer>> map = new HashMap<String, List<Integer>>();
 
         for(int i = 1; i <= document.getNumberOfPages(); ++i) {
-            PDFTextStripper stripper = new PDFTextStripper();
-            stripper.setStartPage(i);
-            stripper.setEndPage(i);
+            String text = getTextForPage(document, i);
+            String metaData = extractMetaDataString(text);
 
-            String splitString = extractSplitString(stripper.getText(document));
-
-            if(splitString != null) {
-                for(String sectionIdentifier : extractSectionIdentifiers(splitString)) {
-
+            if(metaData != null) {
+                for(String sectionIdentifier : extractSectionIdentifiers(metaData)) {
                     if(!map.containsKey(sectionIdentifier)) {
                         map.put(sectionIdentifier, new ArrayList<Integer>());
                     }
@@ -86,7 +80,15 @@ public class PdfSplitter {
         return map;
     }
 
-    protected String extractSplitString(String string) {
+    protected String getTextForPage(PDDocument document, int pageNumber) throws IOException {
+        PDFTextStripper stripper = new PDFTextStripper();
+        stripper.setStartPage(pageNumber);
+        stripper.setEndPage(pageNumber);
+
+        return stripper.getText(document);
+    }
+
+    protected String extractMetaDataString(String string) {
 
         Matcher matcher = pattern.matcher(string);
         String part = null;
@@ -99,9 +101,6 @@ public class PdfSplitter {
     }
 
     protected String[] extractSectionIdentifiers(String string) {
-
-        String part = string.substring(string.indexOf("[") + 1, string.lastIndexOf("]"));
-
-        return StringUtils.deleteWhitespace(part).split(",");
+        return StringUtils.deleteWhitespace(string.substring(string.indexOf("[") + 1, string.lastIndexOf("]"))).split(",");
     }
 }
