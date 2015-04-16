@@ -19,7 +19,7 @@ public class PdfSplitter {
 
     protected static final String SPLIT_STRING_IDENTIFIER = "document_split_parts";
 
-    Pattern pattern;
+    private Pattern pattern;
 
     public PdfSplitter() {
         pattern = Pattern.compile(SPLIT_STRING_IDENTIFIER + "\\[.*?\\]");
