@@ -15,11 +15,11 @@ import com.lowagie.text.pdf.PdfReader;
 import com.lowagie.text.pdf.PdfStamper;
 import com.lowagie.text.pdf.PdfWriter;
 
-public class PdfLineNumberTest {
-	public PdfLineNumberTest() throws Exception {
+public class PdfLineNumberRunner {
+	public PdfLineNumberRunner() throws Exception {
 
 		FileOutputStream out = new FileOutputStream(new File("./sample1.pdf"));
-		ByteArrayOutputStream baos = new PdfGenerator().generatePdf(80000);
+		ByteArrayOutputStream baos = new PdfGenerator().generatePdf(80000, true);
 		out.write(baos.toByteArray());
 		out.flush();
 		out.close();
@@ -28,7 +28,7 @@ public class PdfLineNumberTest {
 	}
 
 	public static void main(String[] args) throws Exception {
-		new PdfLineNumberTest();
+		new PdfLineNumberRunner();
 		System.exit(0);
 	}
 

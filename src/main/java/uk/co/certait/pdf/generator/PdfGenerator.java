@@ -26,15 +26,15 @@ public class PdfGenerator {
 			"circumlocution", "perfidiousness ", "in", "random", "superabundant ", "accoutrements", "test", "Edinburgh", "city",
 			"town", "address", "person", "thing", "computer", "count", "calculator" };
 	
-	public ByteArrayOutputStream generatePdf(int numberOfWords) throws Exception {
-		String html = generateHTML("/templates/template1.vm", numberOfWords);
+	public ByteArrayOutputStream generatePdf(int numberOfWords, boolean hidePageSplitMetaData) throws Exception {
+		String html = generateHTML("/templates/template1.vm", numberOfWords, hidePageSplitMetaData);
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		exportHtml(html, baos);
 
 		return baos;
 	}
 
-	public String generateHTML(String templateName, int numberOfWords) {
+	protected String generateHTML(String templateName, int numberOfWords, boolean hidePageSplitMetaData) {
 		Properties props = new Properties();
 		props.put("resource.loader", "class");
 		props.put("class.resource.loader.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
@@ -46,13 +46,14 @@ public class PdfGenerator {
 		context.put("paragraphs", generateData(numberOfWords));
 		context.put("math", new MathTool());
 		context.put("splitIdentifiers", new String [] {"a", "b", "c", "d", "a,b", "a,d", "c,d", "b,c", "b,c,d", "a,b,c,d"});
+		context.put("isPageSplitMetaDataHidden", hidePageSplitMetaData);
 		Writer writer = new StringWriter();
 		template.merge(context, writer);
 
 		return writer.toString();
 	}
 
-	private List<String> generateData(int numberOfWords) {
+	protected List<String> generateData(int numberOfWords) {
 
 		List<String> data = new ArrayList<>();
 		
@@ -73,7 +74,7 @@ public class PdfGenerator {
 		return data;
 	}
 
-	private void exportHtml(String html, OutputStream out) throws Exception {
+	protected void exportHtml(String html, OutputStream out) throws Exception {
 		DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 		Document doc = builder.parse(new ByteArrayInputStream(html.replaceAll("&nbsp;", "").getBytes()));
 
