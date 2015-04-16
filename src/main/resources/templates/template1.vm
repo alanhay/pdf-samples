@@ -30,11 +30,20 @@
 	</head>
 
 	<body>
-		<p class="hidden">document_split_parts[$splitIdentifiers.get($math.random(0,3))]</p>
+		#if($isPageSplitMetaDataHidden)
+			#set($metaDataClass = "hidden")
+		#else
+			#set($metaDataClass = "")
+		#end
+		
+		#set($maxRandomIndex = $splitIdentifiers.size())
+		#set($maxRandomIndex = $maxRandomIndex - 1)
+		
+		<p class="$metaDataClass">document_split_parts[$splitIdentifiers.get($math.random(0, $maxRandomIndex))]</p>
 		#foreach($para in $paragraphs)
 			#if($foreach.count > 0 && $foreach.count % 5 == 0)
-				<p class="hidden" style="page-break-before:always;">
-					document_split_parts[$splitIdentifiers.get($math.random(0,10))]<br/>
+				<p class="$metaDataClass" style="page-break-before:always;">
+					document_split_parts[$splitIdentifiers.get($math.random(0, $maxRandomIndex))]<br/>
 				</p>
 				<p>$para</p>
 			#else
