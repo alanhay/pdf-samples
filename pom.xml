@@ -7,7 +7,7 @@
 
 	<properties>
 		<S3_BUCKET_NAME>alanhay-maven-repository</S3_BUCKET_NAME>
-		<java.version>8</java.version>
+		<java.version>7</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
