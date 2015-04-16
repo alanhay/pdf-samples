@@ -11,7 +11,7 @@ public class PdfGeneratorRunner {
     
     public static void main(String[] args) throws Exception {
         PdfGenerator generator = new PdfGenerator();
-        ByteArrayOutputStream baos = generator.generatePdf(56600, false);
+        ByteArrayOutputStream baos = generator.generatePdf(113000, false);
         
         FileOutputStream fos = new FileOutputStream(new File("c:/test-pdf/sample.pdf"));
         fos.write(baos.toByteArray());

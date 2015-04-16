@@ -22,68 +22,68 @@ import org.xhtmlrenderer.pdf.ITextRenderer;
 
 public class PdfGenerator {
 
-	private static final String[] words = { "Portable", "document", "legal", "office", "discombobulated", "experienced", "word",
-			"circumlocution", "perfidiousness ", "in", "random", "superabundant ", "accoutrements", "test", "Edinburgh", "city",
-			"town", "address", "person", "thing", "computer", "count", "calculator" };
-	
-	public ByteArrayOutputStream generatePdf(int numberOfWords, boolean hidePageSplitMetaData) throws Exception {
-		String html = generateHTML("/templates/template1.vm", numberOfWords, hidePageSplitMetaData);
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		exportHtml(html, baos);
+    private static final String[] words = { "Portable", "document", "legal", "office", "discombobulated", "experienced", "word", "circumlocution", "perfidiousness ", "in", "random", "superabundant ",
+            "accoutrements", "test", "Edinburgh", "city", "town", "address", "person", "thing", "computer", "count", "calculator" };
 
-		return baos;
-	}
+    public ByteArrayOutputStream generatePdf(int numberOfWords, boolean hidePageSplitMetaData) throws Exception {
+        String html = generateHTML("/templates/template1.vm", numberOfWords, hidePageSplitMetaData);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        exportHtml(html, baos);
 
-	protected String generateHTML(String templateName, int numberOfWords, boolean hidePageSplitMetaData) {
-		Properties props = new Properties();
-		props.put("resource.loader", "class");
-		props.put("class.resource.loader.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
+        return baos;
+    }
 
-		Velocity.init(props);
-		Template template = Velocity.getTemplate(templateName);
+    protected String generateHTML(String templateName, int numberOfWords, boolean hidePageSplitMetaData) {
+        Properties props = new Properties();
+        props.put("resource.loader", "class");
+        props.put("class.resource.loader.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
 
-		VelocityContext context = new VelocityContext();
-		context.put("paragraphs", generateData(numberOfWords));
-		context.put("math", new MathTool());
-		context.put("splitIdentifiers", new String [] {"a", "b", "c", "d", "a,b", "a,d", "c,d", "b,c", "b,c,d", "a,b,c,d"});
-		context.put("isPageSplitMetaDataHidden", hidePageSplitMetaData);
-		Writer writer = new StringWriter();
-		template.merge(context, writer);
+        Velocity.init(props);
+        Template template = Velocity.getTemplate(templateName);
 
-		return writer.toString();
-	}
+        VelocityContext context = new VelocityContext();
+        context.put("paragraphs", generateData(numberOfWords));
+        context.put("math", new MathTool());
+        context.put("splitIdentifiers", new String[] { "section_a", "section_b", "section_c", "section_d", "section_a,section_b", "section_a,section_d", "section_c,section_d", "section_b,section_c",
+                "section_b,section_c,section_d", "section_a,section_b,section_c,section_d" });
+        context.put("isPageSplitMetaDataHidden", hidePageSplitMetaData);
+        Writer writer = new StringWriter();
+        template.merge(context, writer);
 
-	protected List<String> generateData(int numberOfWords) {
+        return writer.toString();
+    }
 
-		List<String> data = new ArrayList<>();
-		
-		int wordCount = 0;
-		
-		while(wordCount < numberOfWords) {
-			for (int i = 0; i < new Random().nextInt(20) + 10; ++i) {
-				StringBuilder builder = new StringBuilder();
-				for (int j = 0; j < new Random().nextInt(150) + 100; ++j) {
-					builder.append(words[new Random().nextInt(words.length)].toLowerCase()).append(" ");
-					++ wordCount;
-				}
-	
-				data.add(builder.toString());
-			}
-		}
+    protected List<String> generateData(int numberOfWords) {
 
-		return data;
-	}
+        List<String> data = new ArrayList<>();
 
-	protected void exportHtml(String html, OutputStream out) throws Exception {
-		DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-		Document doc = builder.parse(new ByteArrayInputStream(html.replaceAll("&nbsp;", "").getBytes()));
+        int wordCount = 0;
 
-		ITextRenderer renderer = new ITextRenderer();
-		renderer.setDocument(doc, null);
+        while (wordCount < numberOfWords) {
+            for(int i = 0; i < new Random().nextInt(20) + 10; ++i) {
+                StringBuilder builder = new StringBuilder();
+                for(int j = 0; j < new Random().nextInt(150) + 100; ++j) {
+                    builder.append(words[new Random().nextInt(words.length)].toLowerCase()).append(" ");
+                    ++wordCount;
+                }
 
-		renderer.layout();
-		renderer.createPDF(out);
-		out.flush();
-		out.close();
-	}
+                data.add(builder.toString());
+            }
+        }
+
+        return data;
+    }
+
+    protected void exportHtml(String html, OutputStream out) throws Exception {
+        DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+        Document doc = builder.parse(new ByteArrayInputStream(html.replaceAll("&nbsp;", "").getBytes()));
+
+        ITextRenderer renderer = new ITextRenderer();
+        renderer.setDocument(doc, null);
+
+        renderer.layout();
+        renderer.createPDF(out);
+        out.flush();
+        out.close();
+    }
 }

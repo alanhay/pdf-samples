@@ -55,7 +55,7 @@ public class PdfSplitter {
         
         document.close();
         
-        System.out.println("Processing Time document (" + pageIndex + " pages): " + (System.currentTimeMillis() - start));
+        System.out.println("Processing Time document (" + (pageIndex - 1) + " pages): " + (System.currentTimeMillis() - start));
 
         return splitDocuments;
     }
