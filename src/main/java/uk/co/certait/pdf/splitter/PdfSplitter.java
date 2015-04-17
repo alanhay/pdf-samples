@@ -1,6 +1,9 @@
 package uk.co.certait.pdf.splitter;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,13 +29,17 @@ public class PdfSplitter {
     }
 
     public Map<String, PDDocument> splitPdf(String path) throws IOException, COSVisitorException {
-
-        PDDocument document = PDDocument.load(path);
+        return splitPdf(new FileInputStream(new File(path)));
+    }
+    
+    public Map<String, PDDocument> splitPdf(InputStream in) throws IOException{
+        PDDocument document = PDDocument.load(in);
         Map<String, List<Integer>> metaData = extractDocumentSplitMetaData(document);
         Map<String, PDDocument> documents = splitDocument(document, new Splitter(), new PDFMergerUtility(), metaData);
         document.close();
+        in.close();
 
-        return documents;
+        return documents;     
     }
 
     protected Map<String, PDDocument> splitDocument(PDDocument document, Splitter splitter, PDFMergerUtility merger, Map<String, List<Integer>> metaData) throws IOException {
